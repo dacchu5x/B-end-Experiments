@@ -1,0 +1,13 @@
+{
+  "name": "library-bookshelf-experiments",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Connected library experiments: Experiment 4 student registration and Experiment 2 student management dashboard with edit and status controls.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

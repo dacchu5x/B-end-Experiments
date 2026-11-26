@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Experiment 2 | Student Records Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="/experiment2/"><span class="mark">B</span>book<span>nest</span></a>
+  <div class="top-right"><span class="status" id="status">Loading records…</span><a href="/experiment4/">← Experiment 4 registration</a></div>
+</header>
+
+<main class="wrap">
+  <section class="intro">
+    <div class="eyebrow">EXPERIMENT 02 · STUDENT MANAGEMENT</div>
+    <h1>Student activity <span>dashboard.</span></h1>
+    <p>View registrations saved from Experiment 4, update student details and manage each student's current status.</p>
+  </section>
+
+  <section class="summary" aria-label="Student summary">
+    <article class="metric metric-total"><span class="metric-icon">♙</span><small>TOTAL STUDENTS</small><strong id="total">0</strong><span class="metric-caption">All saved records</span></article>
+    <article class="metric metric-active"><span class="metric-icon">✓</span><small>ACTIVE</small><strong id="active">0</strong><span class="metric-caption">Currently active</span></article>
+    <article class="metric metric-hold"><span class="metric-icon">Ⅱ</span><small>ON HOLD</small><strong id="onHold">0</strong><span class="metric-caption">Pending follow-up</span></article>
+    <article class="metric metric-inactive"><span class="metric-icon">—</span><small>INACTIVE</small><strong id="inactive">0</strong><span class="metric-caption">Not currently active</span></article>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <div><small>RECORD MANAGEMENT</small><h2>Student directory</h2><p class="panel-subtitle">Edit a registration or change its status directly from this table.</p></div>
+      <div class="toolbar"><button id="refresh" type="button" class="secondary-button">↻ Refresh</button><a class="primary-link" href="/experiment4/">＋ New student</a></div>
+    </div>
+    <div class="filters">
+      <label class="search-box"><span>⌕</span><input id="search" type="search" placeholder="Search name or USN..." aria-label="Search students"></label>
+      <select id="statusFilter" aria-label="Filter by status"><option value="All">All statuses</option><option>Active</option><option>On Hold</option><option>Inactive</option></select>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>USN</th><th>STUDENT</th><th>DEPARTMENT</th><th>BOOKSHELF</th><th>STATUS</th><th>ACTIONS</th></tr></thead>
+        <tbody id="rows"><tr><td colspan="6" class="empty">Loading student records…</td></tr></tbody>
+      </table>
+    </div>
+    <div class="table-footer"><span id="resultCount">0 records</span><span>Changes are saved to <b>students.json</b></span></div>
+  </section>
+
+  <section class="panel json-panel">
+    <div class="panel-head"><div><small>LIVE FILE CONTENT</small><h2>Experiment-2 / students.json</h2></div><span class="file-chip">JSON</span></div>
+    <pre id="json">[]</pre>
+    <p class="note">This is the shared JSON file updated by Experiment 4 registration and the edit/status controls above.</p>
+  </section>
+  <footer>BOOKNEST · EXPERIMENT 02 <span>STUDENT MANAGEMENT DASHBOARD</span></footer>
+</main>
+
+<div class="modal-backdrop" id="editModal" hidden>
+  <section class="edit-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-head"><div><small>UPDATE RECORD</small><h2 id="modalTitle">Edit student</h2></div><button type="button" class="close-modal" id="closeModal" aria-label="Close">×</button></div>
+    <form id="editForm">
+      <input type="hidden" id="editUsn">
+      <div class="edit-grid">
+        <label class="edit-field wide"><span>Student name</span><input id="editName" required maxlength="80"></label>
+        <label class="edit-field"><span>Phone number</span><input id="editPhone" required maxlength="15"></label>
+        <label class="edit-field"><span>Department</span><select id="editDepartment" required><option>CSE</option><option>ISE</option><option>AIML</option><option>ECE</option><option>EEE</option><option>ME</option><option>Civil</option><option>Other</option></select></label>
+        <label class="edit-field"><span>Semester</span><select id="editSemester" required><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select></label>
+        <label class="edit-field"><span>Number of racks</span><input id="editRacks" type="number" min="1" max="8" required></label>
+        <label class="edit-field"><span>Shelves per rack</span><input id="editShelves" type="number" min="1" max="8" required></label>
+        <label class="edit-field wide"><span>Opening style</span><select id="editOpening" required><option>Side Opening</option><option>Top Opening</option><option>Sliding Doors</option><option>Open Shelves</option></select></label>
+      </div>
+      <p class="modal-message" id="editMessage" role="status"></p>
+      <div class="modal-actions"><button type="button" class="secondary-button" id="cancelEdit">Cancel</button><button type="submit" class="save-button" id="saveEdit">Save changes</button></div>
+    </form>
+  </section>
+</div>
+
+<script src="app.js"></script>
+</body></html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Experiment 4 | Student & Bookshelf Registration</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="cupboard3d.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#"><span class="brand-mark">B</span><span>book<span class="brand-accent">nest</span></span><small>LIBRARY SYSTEM</small></a>
+    <div class="top-actions">
+      <span class="connection"><i></i><span id="connectionText">Connecting…</span></span>
+      <a class="switch-link" href="/experiment2/">Experiment 2 storage <span>↗</span></a>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="hero">
+      <div>
+        <div class="eyebrow"><span></span> EXPERIMENT 04 · STUDENT ENTRY</div>
+        <h1>Build your library<br><em>bookshelf.</em></h1>
+        <p>Register a student, record purchased books and configure a custom bookshelf. Your submission is stored in Experiment 2.</p>
+      </div>
+      <div class="hero-stat"><strong>01</strong><span>NEW STUDENT<br>REGISTRATION</span></div>
+    </section>
+
+    <div class="workspace">
+      <section class="form-card">
+        <div class="card-heading">
+          <div><span class="section-kicker">REGISTRATION FORM</span><h2>Student details</h2></div>
+          <span class="required-note">* Required</span>
+        </div>
+        <form id="studentForm">
+          <div class="field-grid">
+            <label class="field wide"><span>Student full name <b>*</b></span><input id="studentName" name="studentName" placeholder="e.g. Dharshan S" required maxlength="80"></label>
+            <label class="field"><span>University seat number (USN) <b>*</b></span><input id="usn" name="usn" placeholder="e.g. 1JN23CS001" required maxlength="20"></label>
+            <label class="field"><span>Phone number <b>*</b></span><input id="phone" name="phone" placeholder="Mobile number" required inputmode="tel" maxlength="15"></label>
+            <label class="field"><span>Department <b>*</b></span>
+              <select id="department" required>
+                <option value="">Select department</option><option>CSE</option><option>ISE</option><option>AIML</option><option>ECE</option><option>EEE</option><option>ME</option><option>Civil</option><option>Other</option>
+              </select>
+            </label>
+            <label class="field"><span>Semester <b>*</b></span>
+              <select id="semester" required><option value="">Select semester</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option></select>
+            </label>
+          </div>
+
+          <div class="section-rule"><span>BOOKS PURCHASED</span><small>ADD THE BOOKS FOR THIS STUDENT</small></div>
+          <div id="bookRows" class="book-rows">
+            <div class="book-row">
+              <input class="book-name" placeholder="Book name (e.g. DBMS)" aria-label="Book name">
+              <input class="book-qty" type="number" min="1" value="1" aria-label="Quantity">
+              <input class="book-price" type="number" min="0" step="0.01" placeholder="Price ₹" aria-label="Price">
+              <button class="remove-book" type="button" aria-label="Remove book" disabled>×</button>
+            </div>
+          </div>
+          <button class="add-book" id="addBook" type="button">＋ Add another book</button>
+
+          <div class="section-rule"><span>BOOKSHELF CONFIGURATION</span><small>LIVE PREVIEW ON THE RIGHT</small></div>
+          <div class="field-grid config-grid">
+            <label class="field"><span>Number of racks <b>*</b></span><input id="racks" type="number" min="1" max="8" value="3" required></label>
+            <label class="field"><span>Shelves per rack <b>*</b></span><input id="shelves" type="number" min="1" max="8" value="4" required></label>
+            <label class="field wide"><span>Opening style <b>*</b></span>
+              <select id="openingStyle" required>
+                <option value="Side Opening">Side opening — hinged doors</option>
+                <option value="Top Opening">Top opening — lift-up panels</option>
+                <option value="Sliding Doors">Sliding doors</option>
+                <option value="Open Shelves">Open shelves — no doors</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="submit-area">
+            <div class="save-destination"><span class="destination-icon">↳</span><span><strong>Save destination</strong><small>Experiment 2 · students.json</small></span></div>
+            <button class="save-button" id="saveButton" type="submit"><span>Save student</span><b>→</b></button>
+          </div>
+          <p class="form-message" id="formMessage" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <aside class="preview-column">
+        <section class="preview-card">
+          <div class="preview-head">
+            <div><span class="section-kicker">LIVE CONFIGURATOR</span><h2>Bookshelf preview</h2></div>
+            <span class="live-pill"><i></i> LIVE</span>
+          </div>
+          <div class="preview-meta"><span id="rackLabel">03 RACKS</span><span id="shelfLabel">04 SHELVES EACH</span></div>
+          <div class="scene-wrap">
+            <div id="bookshelf" class="bookshelf" style="--c3d-w:100%;--c3d-h:320px;--c3d-z:64px"></div>
+          </div>
+          <div class="preview-instruction"><span class="pointer-icon">↗</span> Click or drag a door to open and close it.</div>
+          <div class="config-summary">
+            <div><span>RACKS</span><strong id="summaryRacks">3</strong></div>
+            <div><span>SHELVES / RACK</span><strong id="summaryShelves">4</strong></div>
+            <div><span>OPENING</span><strong id="summaryOpening">Side</strong></div>
+          </div>
+        </section>
+        <section class="info-card">
+          <div class="info-icon">i</div><div><strong>One shared data destination</strong><p>Experiment 4 only submits new students. The Express server writes each record into Experiment 2's JSON file. No separate Experiment 4 database is created.</p></div>
+        </section>
+      </aside>
+    </div>
+    <footer><span>BOOKNEST · LIBRARY MANAGEMENT SYSTEM</span><span>EXPERIMENT 04 <b>•</b> STUDENT REGISTRATION</span></footer>
+  </main>
+  <script src="cupboard3d.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
