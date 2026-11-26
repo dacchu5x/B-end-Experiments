@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Library Management</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Radio State Controllers -->
+  <input type="radio" name="cupboards" id="cup-1">
+  <input type="radio" name="cupboards" id="cup-2" checked>
+  <input type="radio" name="cupboards" id="cup-3">
+  <input type="radio" name="cupboards" id="cup-4">
+  <input type="radio" name="cupboards" id="cup-5">
+  <input type="radio" name="cupboards" id="cup-6">
+
+  <input type="radio" name="shelves" id="sh-1">
+  <input type="radio" name="shelves" id="sh-2">
+  <input type="radio" name="shelves" id="sh-3">
+  <input type="radio" name="shelves" id="sh-4" checked>
+  <input type="radio" name="shelves" id="sh-5">
+  <input type="radio" name="shelves" id="sh-6">
+
+  <input type="radio" name="doors" id="door-glass">
+  <input type="radio" name="doors" id="door-solid" checked>
+  <input type="radio" name="doors" id="door-sliding">
+  <input type="radio" name="doors" id="door-toplift">
+
+  <div class="app">
+    <header class="header">
+      <div class="header-brand">
+        <div class="brand-icon">📚</div>
+        <div class="brand-info">
+          <h1>Library Management</h1>
+          <p>Interactive Library Cupboard & Storage Visualizer</p>
+        </div>
+      </div>
+      <div class="header-status">
+        <div class="status-badge"><span class="status-dot"></span> System Active</div>
+      </div>
+    </header>
+
+    <div class="layout">
+      <!-- Configurator Sidebar -->
+      <aside class="panel">
+        <div class="group">
+          <div class="group-header">
+            <label class="label" for="input-cupboards"><span class="step-chip">01</span> Cupboard Units</label>
+            <span class="range-hint">1 to 6 Units</span>
+          </div>
+          <div class="number-input-wrap">
+            <input type="number" id="input-cupboards" class="custom-num-input" min="1" max="6" value="2" placeholder="2">
+            <span class="input-unit-badge">Units</span>
+          </div>
+        </div>
+
+        <div class="group">
+          <div class="group-header">
+            <label class="label" for="input-shelves"><span class="step-chip">02</span> Shelves / Unit</label>
+            <span class="range-hint">1 to 6 Tiers</span>
+          </div>
+          <div class="number-input-wrap">
+            <input type="number" id="input-shelves" class="custom-num-input" min="1" max="6" value="4" placeholder="4">
+            <span class="input-unit-badge">Tiers</span>
+          </div>
+        </div>
+
+        <div class="group">
+          <div class="group-header">
+            <label class="label"><span class="step-chip">03</span> Door Style</label>
+            <span class="range-hint">Mechanism</span>
+          </div>
+          <div class="grid-2">
+            <label for="door-glass" class="btn btn-glass">
+              <span class="btn-icon">📖</span><span class="btn-name">Open</span><span class="btn-sub">Open Display</span>
+            </label>
+            <label for="door-solid" class="btn btn-solid">
+              <span class="btn-icon">🚪</span><span class="btn-name">Closed</span><span class="btn-sub">Solid Walnut</span>
+            </label>
+            <label for="door-sliding" class="btn btn-sliding">
+              <span class="btn-icon">🪟</span><span class="btn-name">Sliding</span><span class="btn-sub">Tempered Glass</span>
+            </label>
+            <label for="door-toplift" class="btn btn-toplift">
+              <span class="btn-icon">⬆️</span><span class="btn-name">Top Lift</span><span class="btn-sub">Hinged Panel</span>
+            </label>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Visual Preview Area -->
+      <main class="viewport">
+        <div class="title">
+          <div class="title-left"><span>Live Visual Preview</span></div>
+          <div class="stage-pills">
+            <span class="stage-pill">Pure CSS Render</span>
+            <span class="stage-pill stage-pill-gold">Interactive Library</span>
+          </div>
+        </div>
+
+        <div class="room">
+          <div class="cupboard-row" id="cupboard-row"></div>
+        </div>
+
+        <!-- Specifications HUD -->
+        <div class="specs-bar">
+          <div class="spec-item">
+            <span class="spec-label">Active Cupboards</span>
+            <div class="spec-value">
+              <span class="dyn-spec spec-cup-1">1 Unit</span><span class="dyn-spec spec-cup-2">2 Units</span>
+              <span class="dyn-spec spec-cup-3">3 Units</span><span class="dyn-spec spec-cup-4">4 Units</span>
+              <span class="dyn-spec spec-cup-5">5 Units</span><span class="dyn-spec spec-cup-6">6 Units</span>
+            </div>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label">Shelving Tiers</span>
+            <div class="spec-value">
+              <span class="dyn-spec spec-sh-1">1 Shelf per Unit</span><span class="dyn-spec spec-sh-2">2 Shelves per Unit</span>
+              <span class="dyn-spec spec-sh-3">3 Shelves per Unit</span><span class="dyn-spec spec-sh-4">4 Shelves per Unit</span>
+              <span class="dyn-spec spec-sh-5">5 Shelves per Unit</span><span class="dyn-spec spec-sh-6">6 Shelves per Unit</span>
+            </div>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label">Door Mechanism</span>
+            <div class="spec-value">
+              <span class="dyn-spec spec-door-glass">Open Bookshelf</span><span class="dyn-spec spec-door-solid">Solid Panel Doors</span>
+              <span class="dyn-spec spec-door-sliding">Sliding Museum Glass</span><span class="dyn-spec spec-door-toplift">Top-Lift Hinged Doors</span>
+            </div>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label">Material & Accents</span>
+            <div class="spec-value spec-gold">Walnut &amp; Brushed Brass</div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const colors = [
+        ['#0f766e','#99f6e4'],['#3b1704','#fed7aa'],['#9a3412','#ffedd5'],
+        ['#1e293b','#cbd5e1'],['#b45309','#fef08a'],['#881337','#fecdd3'],
+        ['#1e3a8a','#bfdbfe'],['#064e3b','#a7f3d0'],['#78350f','#fde68a'],
+        ['#4c1d95','#ddd6fe'],['#1f2937','#9ca3af'],['#831843','#fbcfe8']
+      ];
+
+      const getBooks = (seed) => {
+        const count = 13 + (seed % 3);
+        let html = '';
+        for (let i = 0; i < count; i++) {
+          if (i > 0 && i % 4 === 0) html += '<div class="book-divider"></div>';
+          const [bg, border] = colors[(i * 3 + seed * 5) % colors.length];
+          const h = 65 + ((i * 17 + seed * 11) % 32), w = 8 + ((i * 7 + seed * 3) % 8);
+          const tilt = i === count - 1 && seed % 2 === 0 ? 'transform:rotate(7deg);transform-origin:bottom left;margin-left:2px;'
+                     : i === 0 && seed % 2 === 1 ? 'transform:rotate(-6deg);transform-origin:bottom right;margin-right:2px;' : '';
+          html += `<div class="book" style="height:${h}%;width:${w}px;background-color:${bg};border-color:${border};${tilt}"><span class="spine-line"></span><span class="spine-title"></span></div>`;
+        }
+        return `<div class="books-row">${html}</div>`;
+      };
+
+      const buildShelfSet = (n, c) => {
+        const tiers = Array.from({ length: n }, (_, i) => `<div class="shelf-tier">${getBooks(c * 10 + i + n)}<div class="shelf-plank"></div></div>`).join('');
+        const sliding = Array.from({ length: n }, () => '<div class="door-row"><span class="glass-door glass-door-left"><i></i></span><span class="glass-door glass-door-right"><i></i></span></div>').join('');
+        const toplift = Array.from({ length: n }, () => '<div class="door-row"><span class="toplift-panel"><i></i></span></div>').join('');
+        return `
+          <div class="shelf-tier-set shelf-${n}">
+            <div class="shelves-container">${tiers}</div>
+            <div class="solid-doors">
+              <div class="solid-door solid-door-left"><div class="door-frame"><div class="door-inner-bevel"></div></div><div class="door-handle door-handle-left"></div></div>
+              <div class="solid-door solid-door-right"><div class="door-frame"><div class="door-inner-bevel"></div></div><div class="door-handle door-handle-right"></div></div>
+            </div>
+            <div class="glass-doors">${sliding}</div>
+            <div class="toplift-doors">${toplift}</div>
+          </div>`;
+      };
+
+      document.getElementById('cupboard-row').innerHTML = Array.from({ length: 6 }, (_, c) => `
+        <div class="cupboard u${c + 1}">
+          <div class="top">CUPBOARD ${c + 1}</div>
+          <div class="cupboard-interior">${Array.from({ length: 6 }, (_, s) => buildShelfSet(s + 1, c + 1)).join('')}</div>
+        </div>
+      `).join('');
+
+      const bindInput = (id, prefix) => {
+        const el = document.getElementById(id);
+        const update = (v) => {
+          let val = Math.min(6, Math.max(1, parseInt(v, 10) || 1));
+          const target = document.getElementById(`${prefix}-${val}`);
+          if (target) target.checked = true;
+          return val;
+        };
+        el.addEventListener('input', (e) => {
+          if (e.target.value) {
+            let v = parseInt(e.target.value, 10);
+            if (v > 6) e.target.value = 6;
+            if (v >= 1 && v <= 6) update(v);
+          }
+        });
+        el.addEventListener('blur', (e) => { e.target.value = update(e.target.value); });
+      };
+
+      bindInput('input-cupboards', 'cup');
+      bindInput('input-shelves', 'sh');
+    })();
+  </script>
+</body>
+</html>
