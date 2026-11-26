@@ -1,0 +1,54 @@
+/* Reusable 3D cupboard scene: one separate 3D cupboard per rack, each with shelves, books and doors.
+   Drawn by cupboard3d.js. The look is ported from the index.html projection (style.css) and scoped
+   under .c3d, so it can sit inside any page (the dashboard uses Tailwind). A page can resize the
+   scene by setting --c3d-w, --c3d-h (frame) and --c3d-z (cupboard depth) on the host. */
+
+/* No `perspective` on .c3d or on any parent of it, on purpose: the tilted grid is drawn without it, but
+   the browser's click hit-testing would apply it, so clicks would land 5 to 15px away from the doors. */
+.c3d { padding: 44px 12px 30px; text-align: center; }
+.c3d *, .c3d *::before, .c3d *::after { box-sizing: border-box; }
+.c3d-frame { width: var(--c3d-w, min(100%, 500px)); height: var(--c3d-h, 300px); margin: 0 auto; }
+.c3d-grid { --z: var(--c3d-z, 90px); display: flex; gap: 14px; height: 100%; transform-style: preserve-3d; pointer-events: none; transform: rotateX(-8deg) rotateY(-22deg); transition: gap .4s ease; }
+.c3d[data-door="openclose"] .c3d-grid { gap: 46px; }
+
+/* One separate cupboard per rack: open front, two side faces, back panel with top and bottom faces.
+   Only the doors and flaps take clicks (see pointer-events on .c3d-grid and here): the grid and the
+   cupboard body sit in the same plane as the doors and would otherwise win the hit test on some
+   cupboards, so a click on a door landed on the body. */
+.c3d-unit { flex: 1; position: relative; transform-style: preserve-3d; pointer-events: none; border: 3px solid #7a5c2e; animation: c3d-grow .45s ease backwards; animation-delay: var(--d, 0s); }
+.c3d-unit::before, .c3d-unit::after { content: ""; position: absolute; top: 0; bottom: 0; width: var(--z); background: #9c7d46; }
+.c3d-unit::before { left: 0; transform-origin: left; transform: rotateY(90deg); }
+.c3d-unit::after { right: 0; transform-origin: right; transform: rotateY(-90deg); }
+.c3d-back { position: absolute; inset: 0; background: #b8945f; transform-style: preserve-3d; transform: translateZ(calc(var(--z) * -1)); }
+.c3d-back::before, .c3d-back::after { content: ""; position: absolute; left: 0; right: 0; height: var(--z); }
+.c3d-back::before { top: 0; background: #dcc194; transform-origin: top; transform: rotateX(90deg); }
+.c3d-back::after { bottom: 0; background: #8a6b38; transform-origin: bottom; transform: rotateX(-90deg); }
+.c3d-shelf { position: absolute; left: 0; right: 0; height: var(--z); background: #d3b686; border: 1px solid #7a5c2e; transform-origin: top; transform: rotateX(-90deg); }
+.c3d-books { position: absolute; left: 0; right: 0; display: flex; align-items: flex-end; gap: 2px; padding: 0 5px 2px; pointer-events: none; transform: translateZ(calc(var(--z) * -.37)); }
+.c3d-book { display: block; border: 1px solid rgba(0,0,0,.35); border-radius: 1px 1px 0 0; box-shadow: inset -2px 0 0 rgba(255,255,255,.18); transform-origin: bottom; transform: rotate(var(--r, 0deg)); animation: c3d-rise .45s ease backwards; animation-delay: var(--d, 0s); }
+
+/* Doors stay hidden unless the door type shows them. --p is the open amount of one door, 0 closed to 1 open. */
+.c3d-door { display: none; position: absolute; top: 0; bottom: 0; width: 50%; background: rgba(150,195,215,.35); border: 2px solid #5b5b5b; transition: transform .4s ease, left .4s ease, right .4s ease; pointer-events: auto; cursor: grab; touch-action: none; user-select: none; }
+.c3d-door::after { content: ""; position: absolute; top: 40%; height: 20%; width: 3px; border-radius: 2px; background: #e6e9ee; box-shadow: 0 0 0 1px rgba(0,0,0,.3); }
+.c3d-left { left: 0; transform-origin: left; }
+.c3d-left::after { right: 4px; }
+.c3d-right { right: 0; transform-origin: right; }
+.c3d-right::after { left: 4px; }
+.c3d .c3d-dragging { transition: none; cursor: grabbing; }
+.c3d[data-material="wood"] .c3d-door { background: #a3703d; border-color: #5a3a1a; }
+
+/* Sliding: the left panel runs on the front track and glides over the right one */
+.c3d[data-door="sliding"] .c3d-door, .c3d[data-door="openclose"] .c3d-door { display: block; }
+.c3d[data-door="sliding"] .c3d-left { left: calc(var(--p, 0) * 48%); transform: translateZ(calc(var(--z) * .11)); }
+.c3d[data-door="sliding"] .c3d-right { right: calc(var(--p, 0) * 48%); }
+/* Open/close: doors swing out on hinges at the outer edges */
+.c3d[data-door="openclose"] .c3d-left { transform: rotateY(calc(var(--p, 0) * -115deg)); }
+.c3d[data-door="openclose"] .c3d-right { transform: rotateY(calc(var(--p, 0) * 115deg)); }
+/* Top opening: one glass flap per compartment, hinged at the top and lifting upward. */
+.c3d-flap { display: none; position: absolute; left: 0; right: 0; background: rgba(150,195,215,.35); border: 2px solid #5b5b5b; transform-origin: top; transform: rotateX(calc(var(--p, 0) * 70deg)); transition: transform .4s ease; pointer-events: auto; cursor: grab; touch-action: none; user-select: none; }
+.c3d-flap::after { content: ""; position: absolute; top: 5px; left: calc(50% - 13px); width: 26px; height: 3px; border-radius: 2px; background: #e6e9ee; box-shadow: 0 0 0 1px rgba(0,0,0,.3); }
+.c3d[data-door="dropdown"] .c3d-flap { display: block; }
+
+@keyframes c3d-grow { from { opacity: 0; transform: translateY(16px) scale(.94); } }
+@keyframes c3d-rise { from { opacity: 0; transform: translateY(12px) rotate(var(--r, 0deg)); } }
+@media (prefers-reduced-motion: reduce) { .c3d *, .c3d *::before, .c3d *::after { animation-duration: .01s !important; transition-duration: .01s !important; } }
