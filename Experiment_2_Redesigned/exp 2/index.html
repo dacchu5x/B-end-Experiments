@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BOOKNEST — Library Design Studio</title>
+  <meta name="description" content="Interactive 3D Library Cupboard & Storage Visualizer with unlimited units, shelf tiers, and collision-safe interactive sliding and hinged doors.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
+  <script src="phoneValidation.js"></script>
+  <style>
+    /* ── Searchable Country Dropdown ── */
+    .country-search-wrap { position: relative; flex: 0 0 52%; }
+    .country-search-trigger {
+      display: flex; align-items: center; gap: 6px;
+      width: 100%; padding: 10px 10px; border-radius: var(--radius-md);
+      border: 1px solid rgba(255,255,255,0.12); background: rgba(10,14,25,0.85);
+      color: #e2e8f0; font-size: 0.78rem; font-family: inherit;
+      cursor: pointer; text-align: left; white-space: nowrap; overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .country-search-trigger:focus, .country-search-trigger.open {
+      border-color: rgba(234,179,8,0.55); outline: none;
+    }
+    .country-search-trigger.input-error { border-color: rgba(239,68,68,0.7) !important; }
+    .country-search-trigger .trigger-text { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+    .country-search-trigger .trigger-arrow { font-size: 0.6rem; opacity: 0.6; flex-shrink: 0; }
+    .country-dropdown-panel {
+      display: none; position: absolute; top: calc(100% + 4px); left: 0; z-index: 9999;
+      width: 280px; background: #0f172a; border: 1px solid rgba(255,255,255,0.15);
+      border-radius: var(--radius-md); box-shadow: 0 12px 32px rgba(0,0,0,0.6);
+      overflow: hidden;
+    }
+    .country-dropdown-panel.open { display: flex; flex-direction: column; }
+    .country-search-input {
+      width: 100%; padding: 10px 12px; border: none; border-bottom: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.05); color: #e2e8f0; font-size: 0.8rem;
+      font-family: inherit; outline: none; box-sizing: border-box;
+    }
+    .country-options-list {
+      max-height: 220px; overflow-y: auto; list-style: none; margin: 0; padding: 4px 0;
+    }
+    .country-options-list li {
+      padding: 7px 12px; cursor: pointer; font-size: 0.8rem; color: #cbd5e1;
+      transition: background 0.15s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .country-options-list li:hover, .country-options-list li.highlighted { background: rgba(234,179,8,0.15); color: #fff; }
+    .country-options-list li.selected { color: var(--gold-400); font-weight: 700; }
+    .country-no-results { padding: 10px 12px; font-size: 0.78rem; color: var(--text-muted); text-align: center; }
+  </style>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <div class="header-brand">
+        <div class="brand-icon">✦</div>
+        <div class="brand-info">
+          <h1>BOOKNEST</h1>
+          <p>Library design studio · Plan, preview &amp; manage</p>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <button type="button" class="customer-mgmt-toggle" id="btn-open-cm" title="Go to Customer Data Manager">
+          👥 Customer Data Manager <span class="count-badge" id="cm-count-badge">0</span>
+        </button>
+        <div class="status-badge"><span class="status-dot"></span>System Active</div>
+      </div>
+    </header>
+
+    <div class="layout">
+      <!-- Control Sidebar -->
+      <aside class="panel">
+        <div class="group">
+          <div class="group-header">
+            <label class="label"><span class="step-chip">00</span>Project Info</label>
+            <span class="range-hint">Details & Size</span>
+          </div>
+          <div class="stepper-wrap" style="display: flex; gap: 8px;">
+             <input type="text" id="customer-id" class="custom-num-input" placeholder="Customer ID (Unique)" style="font-size: 0.95rem; width: 100%; border: 1px solid rgba(255,255,255,0.12); background: rgba(10,14,25,0.85); padding: 12px 14px; border-radius: var(--radius-md);">
+             <button type="button" id="btn-gen-cust-id" title="Generate Different Customer ID" class="step-btn" style="width: auto; padding: 0 12px; font-size: 0.8rem; font-weight: 700; white-space: nowrap; border-radius: var(--radius-md); background: rgba(234, 179, 8, 0.15); border: 1px solid rgba(234, 179, 8, 0.35); color: var(--gold-400); cursor: pointer;">✨ New ID</button>
+          </div>
+          <div class="field-error" id="customer-id-error"></div>
+          <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
+            <div>
+              <input type="text" id="customer-name" class="custom-num-input" placeholder="Customer Name (e.g. Alexander Wright)" style="font-size: 0.88rem; width: 100%; border: 1px solid rgba(255,255,255,0.12); background: rgba(10,14,25,0.85); padding: 10px 14px; border-radius: var(--radius-md);">
+              <div class="field-error" id="customer-name-error"></div>
+            </div>
+            <div>
+              <div style="display: flex; gap: 8px;">
+                <!-- Searchable Country Selector -->
+                <div class="country-search-wrap" id="country-search-wrap">
+                  <button type="button" id="country-search-trigger" class="country-search-trigger" aria-haspopup="listbox" aria-expanded="false">
+                    <span class="trigger-text" id="country-trigger-text">Select country</span>
+                    <span class="trigger-arrow">▼</span>
+                  </button>
+                  <div class="country-dropdown-panel" id="country-dropdown-panel" role="listbox">
+                    <input type="text" class="country-search-input" id="country-search-input" placeholder="Search country or +code..." autocomplete="off">
+                    <ul class="country-options-list" id="country-options-list"></ul>
+                  </div>
+                </div>
+                <!-- Hidden inputs to store selected country data -->
+                <input type="hidden" id="customer-country-iso" value="">
+                <input type="hidden" id="customer-country-code" value="">
+                <input type="tel" id="customer-phone" class="custom-num-input" inputmode="numeric" required placeholder="Phone Number" style="font-size: 0.88rem; width: 100%; min-width: 0; border: 1px solid rgba(255,255,255,0.12); background: rgba(10,14,25,0.85); padding: 10px 14px; border-radius: var(--radius-md);">
+              </div>
+              <div class="field-error" id="customer-phone-error"></div>
+            </div>
+            <div>
+              <input type="email" id="customer-email" class="custom-num-input" placeholder="Email Address (e.g. fgdfs@gmail.com)" style="font-size: 0.88rem; width: 100%; border: 1px solid rgba(255,255,255,0.12); background: rgba(10,14,25,0.85); padding: 10px 14px; border-radius: var(--radius-md);">
+              <div class="field-error" id="customer-email-error"></div>
+            </div>
+          </div>
+          <div id="customer-id-status" style="font-size: 0.72rem; color: var(--text-sub); margin-top: 4px; padding-left: 2px;"></div>
+
+          <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 10px;">
+            <!-- Width -->
+            <div class="dim-field-wrap">
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <label for="input-room-width" style="font-size: 0.72rem; font-weight: 700; color: var(--text-sub); min-width: 78px; flex-shrink: 0;">Width (mm)</label>
+                <div class="stepper-wrap" style="flex: 1; gap: 6px;" id="width-stepper">
+                  <button class="step-btn" id="width-dec" type="button" aria-label="Decrease width">−</button>
+                  <div class="number-input-wrap" id="width-input-wrap">
+                    <input type="number" id="input-room-width" class="custom-num-input" min="900" step="100" value="900">
+                  </div>
+                  <button class="step-btn" id="width-inc" type="button" aria-label="Increase width">+</button>
+                </div>
+              </div>
+              <div class="dim-error" id="width-error"></div>
+            </div>
+            <!-- Height -->
+            <div class="dim-field-wrap">
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <label for="input-room-height" style="font-size: 0.72rem; font-weight: 700; color: var(--text-sub); min-width: 78px; flex-shrink: 0;">Height (mm)</label>
+                <div class="stepper-wrap" style="flex: 1; gap: 6px;" id="height-stepper">
+                  <button class="step-btn" id="height-dec" type="button" aria-label="Decrease height">−</button>
+                  <div class="number-input-wrap" id="height-input-wrap">
+                    <input type="number" id="input-room-height" class="custom-num-input" min="350" max="3000" step="100" value="350">
+                  </div>
+                  <button class="step-btn" id="height-inc" type="button" aria-label="Increase height">+</button>
+                </div>
+              </div>
+              <div class="dim-error" id="height-error"></div>
+            </div>
+            <!-- Depth -->
+            <div class="dim-field-wrap">
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <label for="input-room-depth" style="font-size: 0.72rem; font-weight: 700; color: var(--text-sub); min-width: 78px; flex-shrink: 0;">Depth (mm)</label>
+                <div class="stepper-wrap" style="flex: 1; gap: 6px;" id="depth-stepper">
+                  <button class="step-btn" id="depth-dec" type="button" aria-label="Decrease depth">−</button>
+                  <div class="number-input-wrap" id="depth-input-wrap">
+                    <input type="number" id="input-room-depth" class="custom-num-input" min="200" max="1000" step="50" value="200">
+                  </div>
+                  <button class="step-btn" id="depth-inc" type="button" aria-label="Increase depth">+</button>
+                </div>
+              </div>
+              <div class="dim-error" id="depth-error"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="group">
+          <div class="group-header">
+            <label class="label" for="input-cupboards"><span class="step-chip">01</span>Cupboard Units</label>
+            <span class="range-hint">Based on Room Width</span>
+          </div>
+          <div class="stepper-wrap">
+            <button class="step-btn" id="cupboards-dec" type="button" aria-label="Decrease cupboards">−</button>
+            <div class="number-input-wrap" id="cupboards-input-wrap">
+              <input type="number" id="input-cupboards" class="custom-num-input" min="1" value="1">
+              <span class="input-unit-badge">Units</span>
+            </div>
+            <button class="step-btn" id="cupboards-inc" type="button" aria-label="Increase cupboards">+</button>
+          </div>
+          <div class="field-error" id="cupboards-error"></div>
+          <div id="cupboard-auto-hint" style="font-size: 0.71rem; color: var(--text-sub); margin-top: 5px; padding-left: 2px;">💡 Auto-calculated: 1 unit @ 900mm each fits in 900mm room</div>
+        </div>
+
+        <div class="group">
+          <div class="group-header">
+            <label class="label" for="input-shelves"><span class="step-chip">02</span>Shelves / Unit</label>
+            <span class="range-hint">Based on Room Height</span>
+          </div>
+          <div class="stepper-wrap">
+            <button class="step-btn" id="shelves-dec" type="button" aria-label="Decrease shelves">−</button>
+            <div class="number-input-wrap" id="shelves-input-wrap">
+              <input type="number" id="input-shelves" class="custom-num-input" min="1" max="10" value="1">
+              <span class="input-unit-badge">Tiers</span>
+            </div>
+            <button class="step-btn" id="shelves-inc" type="button" aria-label="Increase shelves">+</button>
+          </div>
+          <div class="field-error" id="shelves-error"></div>
+          <div id="shelf-auto-hint" style="font-size: 0.71rem; color: var(--text-sub); margin-top: 5px; padding-left: 2px;">💡 Auto-calculated: max 1 tier @ 350mm each fits in 350mm room</div>
+        </div>
+
+        <div class="group">
+          <div class="group-header">
+            <label class="label"><span class="step-chip">03</span>Door Style</label>
+            <span class="range-hint">Mechanism</span>
+          </div>
+          <div class="grid-2">
+            <button type="button" class="btn btn-door-style" data-style="open"><span class="btn-icon">📖</span><span class="btn-name">Open</span><span class="btn-sub">Open Display</span></button>
+            <button type="button" class="btn btn-door-style active" data-style="solid"><span class="btn-icon">🚪</span><span class="btn-name">Closed</span><span class="btn-sub">Solid Walnut</span></button>
+            <button type="button" class="btn btn-door-style" data-style="sliding"><span class="btn-icon">🪟</span><span class="btn-name">Sliding</span><span class="btn-sub">Tempered Glass</span></button>
+            <button type="button" class="btn btn-door-style" data-style="toplift"><span class="btn-icon">⬆️</span><span class="btn-name">Top Lift</span><span class="btn-sub">Hinged Panel</span></button>
+          </div>
+        </div>
+
+        <div class="group">
+          <div class="group-header">
+            <label class="label"><span class="step-chip">04</span>Door Actions</label>
+            <span class="range-hint">Batch Controls</span>
+          </div>
+          <div class="door-action-buttons">
+            <button type="button" class="action-btn" id="btn-open-all">🔓 Open All</button>
+            <button type="button" class="action-btn" id="btn-close-all">🔒 Close All</button>
+            <button type="button" class="action-btn" id="btn-open-left">◧ Open Left</button>
+            <button type="button" class="action-btn" id="btn-close-left">◧ Close Left</button>
+            <button type="button" class="action-btn" id="btn-open-right">◨ Open Right</button>
+            <button type="button" class="action-btn" id="btn-close-right">◨ Close Right</button>
+          </div>
+          <p class="door-click-tip">💡 <strong>Interactive Doors:</strong> Click any door panel to swing or slide it open/closed. Use batch buttons to toggle all, left, or right doors.</p>
+        </div>
+
+        <div class="group">
+          <div class="group-header">
+            <label class="label"><span class="step-chip">05</span>Generate</label>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <button type="button" id="btn-generate" class="btn" style="background: #4b5563; color: white; border: none; font-weight: 600;">Generate Design</button>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <button type="button" id="btn-accept" class="btn" style="background: #10b981; color: white; border: none; font-weight: 600;">Accept</button>
+              <button type="button" id="btn-redesign" class="btn" style="background: #b45309; color: white; border: none; font-weight: 600;">Redesign</button>
+            </div>
+            <button type="button" id="btn-reconfigure" class="btn" style="background: #1e3a8a; color: white; border: none; font-weight: 600;">Start New / Reconfigure</button>
+          </div>
+          <div id="generate-alert" style="display: none; margin-top: 12px; padding: 10px; background: rgba(16, 185, 129, 0.15); color: #a7f3d0; border: 1px solid rgba(16, 185, 129, 0.3); border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 600; text-align: center;">
+            Design accepted - saved to library design json.
+          </div>
+        </div>
+
+        <div class="group">
+          <button type="button" id="btn-save" class="btn" style="background: var(--gold-500); color: #000; font-weight: 800; font-size: 1rem; padding: 14px; border: none; box-shadow: 0 4px 10px rgba(234, 179, 8, 0.4);">💾 Save Configuration</button>
+        </div>
+      </aside>
+
+      <!-- Main Stage Viewport -->
+      <main class="viewport">
+        <div class="title">
+          <div class="title-left"><span>Your 3D design canvas</span></div>
+          <div class="stage-pills">
+            <span class="stage-pill" id="door-status-pill">Interactive 3D Hinges</span>
+            <span class="stage-pill stage-pill-gold">Fixed Perspective</span>
+          </div>
+        </div>
+        
+        <div class="room-container" id="room-container">
+          <div class="room">
+            <div class="room-spotlight"></div>
+            <div id="layout-overflow-warning">⚠️ Too many cupboards to fit — reduce count or increase room width</div>
+            <div class="cupboard-row" id="cupboard-row"></div>
+            <div class="floor-reflection"></div>
+          </div>
+        </div>
+
+        <div class="specs-bar">
+          <div class="spec-item"><span class="spec-label">Room Dimensions</span><div class="spec-value" id="hud-dimensions">900mm × 350mm × 200mm</div></div>
+          <div class="spec-item"><span class="spec-label">Active Cupboards</span><div class="spec-value" id="hud-cupboards">1 Unit</div></div>
+          <div class="spec-item"><span class="spec-label">Shelving Tiers</span><div class="spec-value" id="hud-shelves">1 Shelf per Unit</div></div>
+          <div class="spec-item"><span class="spec-label">Door Mechanism</span><div class="spec-value" id="hud-doors">Solid Panel Doors</div></div>
+        </div>
+      </main>
+    </div>
+
+      </div><!-- /.app -->
+
+  <!-- Customer Management Modal -->
+  <div class="cm-overlay" id="cm-overlay">
+    <div class="cm-modal">
+      <div class="cm-header">
+        <div class="cm-header-title">
+          <span class="cm-icon">👥</span>
+          Customer Data Manager
+        </div>
+        <button type="button" class="cm-close-btn" id="cm-close-btn">✕</button>
+      </div>
+      <div class="cm-toolbar">
+        <div class="cm-search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" class="cm-search-input" id="cm-search" placeholder="Search by ID, name, phone, or email…">
+        </div>
+        <button type="button" class="cm-toolbar-btn cm-btn-new-cust" id="cm-btn-new-cust" style="background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.4);">➕ New Customer</button>
+        <button type="button" class="cm-toolbar-btn cm-btn-export" id="cm-btn-export">📥 Export JSON</button>
+        <button type="button" class="cm-toolbar-btn cm-btn-import" id="cm-btn-import">📤 Import JSON</button>
+        <button type="button" class="cm-toolbar-btn cm-btn-delete-all" id="cm-btn-delete-all">🗑️ Delete All</button>
+        <input type="file" id="cm-import-file" accept=".json">
+      </div>
+      <div class="cm-body" id="cm-body">
+        <!-- Table or empty state rendered here -->
+      </div>
+      <div class="cm-footer">
+        <div class="cm-footer-stat"><span class="cm-footer-dot"></span> <span id="cm-footer-text">0 customers</span></div>
+        <div>Customer records synced with server</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Main application script (extracted to script.js for Experiment 2 report) -->
+  <script src="script.js"></script>
+
+</body>
+</html>
